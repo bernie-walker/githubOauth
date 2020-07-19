@@ -2,6 +2,8 @@ const express = require('express');
 const axios = require('axios');
 const app = express();
 
+const PORT = process.env.PORT || 3000;
+
 let sessionID = 0;
 const sessions = {};
 
@@ -24,8 +26,8 @@ app.get('/userPage', (req, res) => {
   res.render('user', { name: 'default' });
 });
 
-app.listen(3000, () => {
-  console.log('app started listening on 3000...');
+app.listen(PORT, () => {
+  console.log(`app started on ${PORT}...`);
 });
 
 // axios({
