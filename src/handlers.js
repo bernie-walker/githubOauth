@@ -16,32 +16,50 @@ const insertUserName = function (userName) {
   return id;
 };
 
-const getUserInfo = function (accessToken) {
-  return axios.get('https://api.github.com/user', {
+const extractAndResolve = function (resolve, response, extractionKey) {
+  resolve(response.data[extractionKey]);
+};
+
+const fetchAuthData = function (config, extractionKey) {
+  return new Promise((resolve) => {
+    axios(config).then((response) => {
+      extractAndResolve(resolve, response, extractionKey);
+    });
+  });
+};
+
+const generateUserInfoConfig = function (accessToken) {
+  return {
+    url: 'https://api.github.com/user',
     headers: {
       Authorization: `token ${accessToken}`,
       accept: 'application/json',
     },
-  });
+  };
 };
 
-const getAccessToken = function (code) {
-  return axios({
+const generateAccessTokenConfig = function (code) {
+  return {
     method: 'post',
     url: `https://github.com/login/oauth/access_token?client_id=${clientID}&client_secret=${clientSecret}&code=${code}`,
     headers: {
       accept: 'application/json',
     },
-  });
+  };
 };
 
 const registerSession = async function (accessCode) {
   let userName;
-  const { access_token: accessToken } = await getAccessToken(accessCode);
+  const accessToken = await fetchAuthData(
+    generateAccessTokenConfig(accessCode),
+    'access_token'
+  );
 
   if (accessToken) {
-    const userInfo = getUserInfo(accessToken);
-    userName = userInfo.login;
+    userName = await fetchAuthData(
+      generateUserInfoConfig(accessToken),
+      'login'
+    );
   }
 
   if (userName) {
@@ -63,10 +81,10 @@ const processAuthCode = function (req, res) {
 };
 
 const renderUserPage = function (req, res) {
-  const { sesID } = req.cookie;
+  const { sesID } = req.cookies;
   const userName = sessions[sesID];
 
-  if (userName) {
+  if (!userName) {
     res.status(401).end();
     return;
   }
