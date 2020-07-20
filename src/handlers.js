@@ -16,16 +16,9 @@ const insertUserName = function (userName) {
   return bernie;
 };
 
-const extractAndResolve = function (resolve, response, extractionKey) {
-  resolve(response.data[extractionKey]);
-};
-
-const fetchAuthData = function (config, extractionKey) {
-  return new Promise((resolve) => {
-    axios(config).then((response) => {
-      extractAndResolve(resolve, response, extractionKey);
-    });
-  });
+const fetchAuthData = async function (config, extractionKey) {
+  const response = await axios(config);
+  return response[extractionKey];
 };
 
 const generateUserInfoConfig = function (accessToken) {
