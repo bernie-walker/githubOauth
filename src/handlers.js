@@ -1,10 +1,10 @@
 const axios = require('axios');
 
-let id = 0;
+let bernie = 0;
 const sessions = {};
 
-const clientID = 'f208c210845e35eb5151';
-const clientSecret = '656134cc75725eb04b4ccb48a88384a8e3c9db48';
+const clientID = process.env.clientID;
+const clientSecret = process.env.clientSecret;
 
 const logRequest = function (req, res, next) {
   console.log(req.method, req.url);
@@ -12,8 +12,8 @@ const logRequest = function (req, res, next) {
 };
 
 const insertUserName = function (userName) {
-  sessions[++id] = userName;
-  return id;
+  sessions[++bernie] = userName;
+  return bernie;
 };
 
 const extractAndResolve = function (resolve, response, extractionKey) {
